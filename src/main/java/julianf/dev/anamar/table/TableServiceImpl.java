@@ -21,7 +21,7 @@ public class TableServiceImpl implements TableService {
 
     @Override
     public RestaurantTable getTableById(Short id) throws NoSuchElementException {
-        log.info("TableServiceImpl.getTableById: " + tableRepository.findById(id).orElse(null));
+        log.info("TableService.getTableById " + tableRepository.findById(id).orElse(null));
         return tableRepository.findById(id).orElseThrow();
     }
 

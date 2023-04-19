@@ -13,7 +13,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDTO> getAllItems() {
-        return itemRepository.findAll().stream().map(ItemDTO::new).toList();
+//        return itemRepository.findAll().stream().map(ItemDTO::new).toList();
+        return null;
     }
 
     @Override
