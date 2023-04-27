@@ -43,6 +43,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderNoItemsDTO> findAll() {//
+        log.info("getOrders");
         return orderMapper.orderToOrderNoItemsDTO(orderRepository.findAll());
 
     }
@@ -78,12 +79,9 @@ public class OrderServiceImpl implements OrderService {
                 itemList.add(item);
             }
         });
-        order.setCustomerName("Pedro"
-        );
         order.setTotal(order.getItems().stream().mapToDouble(item -> item.getProduct().getUnitPrice() * item.getAmount()).sum());
         order.setItems(itemList);
         orderRepository.save(order);
-
     }
     @Override
     public void deleteItemFromOrder(Long idorders, Long idItem) {
@@ -92,6 +90,8 @@ public class OrderServiceImpl implements OrderService {
         itemsorders.removeIf(item -> item.getId() == idItem);
         orderRepository.save(actualorders);
     }
+
+
 
 
 }

@@ -1,15 +1,13 @@
 package julianf.dev.anamar.order;
 
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import julianf.dev.anamar.address.Address;
 import julianf.dev.anamar.item.Item;
-import julianf.dev.anamar.item.dto.ItemDTO;
-import julianf.dev.anamar.product.Product;
-import julianf.dev.anamar.product.ProductDTO;
 import julianf.dev.anamar.table.RestaurantTable;
-import julianf.dev.anamar.waiter.Waiter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -50,7 +48,6 @@ public class Orders {
     @JoinColumn(name = "order_id")
     @ToString.Exclude
     private Set<Item> items = new HashSet<>();
-
 
 
     @PrePersist

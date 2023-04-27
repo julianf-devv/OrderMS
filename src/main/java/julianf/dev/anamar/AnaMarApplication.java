@@ -88,6 +88,12 @@ public class AnaMarApplication implements CommandLineRunner {
         pepsi.setUnitPrice(1.8);
         pepsi.setStock(5);
 
+        var consome = new Product();
+        consome.setName("Consome");
+        consome.setDescription("Consome de pollo");
+        consome.setUnitPrice(1.8);
+        consome.setStock(5);
+
 
         var item1 = new Item();
         item1.setProduct(cocaCola);
@@ -125,8 +131,9 @@ public class AnaMarApplication implements CommandLineRunner {
         waiterRepository.save(waiter);
         order.setOrderFinished(false);
         order.setCustomerName("Julian");
-        order.setItems(Set.of(item1, item2, item3, item4, item5));
+        order.setItems(Set.of(item1, item2, item3, item4));
         pepsi.setType(ProductType.BEBIDA);
+        productRepository.save(consome);
         //  item.setOrder(order); // Establece el Order en el Item
         orderRepository.save(order);
 

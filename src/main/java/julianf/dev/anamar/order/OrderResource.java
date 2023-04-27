@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import julianf.dev.anamar.item.ItemRepository;
 import julianf.dev.anamar.order.dto.AddItemToOrderDTO;
-import julianf.dev.anamar.item.Item;
 import julianf.dev.anamar.order.dto.OrderDTO;
 import julianf.dev.anamar.order.dto.OrderNoItemsDTO;
 import julianf.dev.anamar.order.dto.RemoveItemFromOrderDTO;
@@ -19,10 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -51,6 +48,7 @@ public class OrderResource {
 
     @GetMapping("/v1/orders")
     public List<OrderNoItemsDTO> getOrders(HttpServletResponse response) {
+        log.info("getOrders");
         response.setHeader("trace-id", UUID.randomUUID().toString().replace("-", ":"));
         return orderService.findAll();
     }
@@ -75,8 +73,7 @@ public class OrderResource {
         orderService.addItemToOrder(id, items);
     }
 
-    @DeleteMapping("/v1/orders/{id}")
-    @Operation(summary = "Add item(s) to an order")
+
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Item(s) deleted from order",
                     content = @Content(mediaType = "application/json",
@@ -84,14 +81,16 @@ public class OrderResource {
             @ApiResponse(responseCode = "404", description = "Order not found",
                     content = @Content(mediaType = "application/json"))
     })
-
     @Transactional
+    @DeleteMapping("/v1/orders/{id}")
+    @Operation(summary = "Add item(s) to an order")
     public ResponseEntity<?> deleteItemFromOrder(@PathVariable Long id, @RequestBody List<RemoveItemFromOrderDTO> itemsToDelete) {
         var order = orderRepository.findById(id).get();
         var items = order.getItems();
+        log.info("items: {}", items);
         var itemsCopy = new HashSet<>(items);
         itemsToDelete.forEach(itemToDelete -> items.forEach(item -> {
-            if (item.getId() == itemToDelete.productId()) {
+            if (item.getProduct().getId().equals(itemToDelete.productId())) {
                 if(itemToDelete.removeAll())
                 {
                     itemRepository.deleteById((long) item.getId());
@@ -112,5 +111,6 @@ public class OrderResource {
         orderRepository.save(order);
         return ResponseEntity.ok().build();
     }
+
 
 }

@@ -2,7 +2,6 @@ package julianf.dev.anamar.order.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import julianf.dev.anamar.item.dto.ItemDTO;
 import julianf.dev.anamar.product.ProductDTO;
 
 import java.time.LocalDateTime;
