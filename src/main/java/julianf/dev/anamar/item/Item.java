@@ -20,7 +20,7 @@ public class Item {
     private short id;
     private int amount;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @ToString.Exclude
     private Product product;
 

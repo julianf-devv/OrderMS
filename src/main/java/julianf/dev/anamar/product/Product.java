@@ -8,7 +8,9 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -31,6 +33,9 @@ public class Product {
     private LocalDateTime addedDate;
 
     private ProductType type;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    private Set<Item> items = new HashSet<>();
 
 
     @PrePersist
