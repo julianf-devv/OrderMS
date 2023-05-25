@@ -2,7 +2,6 @@ package julianf.dev.anamar.order;
 
 import jakarta.transaction.Transactional;
 import julianf.dev.anamar.item.Item;
-import julianf.dev.anamar.item.dto.ItemDTO;
 import julianf.dev.anamar.mapper.OrderMapper;
 import julianf.dev.anamar.order.dto.AddItemToOrderDTO;
 import julianf.dev.anamar.order.dto.OrderDTO;
@@ -62,21 +61,22 @@ public class OrderServiceImpl implements OrderService {
         items.forEach(itemtoAdd -> currentItemList.stream()
                 .filter(existingItem -> Objects.equals(itemtoAdd.productId(), existingItem.getProduct().getId()))
                 .findFirst()
-                .map(existingItem -> {
-                    existingItem.setAmount(existingItem.getAmount() + itemtoAdd.amount());
-                    return existingItem;
-        }).orElseGet(() -> addNewItem(currentItemList, itemtoAdd)));
+                .ifPresentOrElse(existingItem -> setExistingItemAmount(existingItem, itemtoAdd.amount()), () -> addNewItem(currentItemList, itemtoAdd)));
         updateOrderTotal(order);
-        order.setItems(currentItemList);
         orderRepository.save(order);
     }
-    private Item addNewItem(Set<Item> itemList, AddItemToOrderDTO itemToAdd) {
+
+    private void setExistingItemAmount(Item existingItem, int amountToAdd) {
+        existingItem.setAmount(existingItem.getAmount() + amountToAdd);
+    }
+
+    private void addNewItem(Set<Item> itemList, AddItemToOrderDTO itemToAdd) {
         Item newItem = new Item();
         newItem.setProduct(productRepository.findById(itemToAdd.productId()).orElseThrow());
         newItem.setAmount(itemToAdd.amount());
         itemList.add(newItem);
-        return newItem;
     }
+
     private void updateOrderTotal(Orders order) {
         double totalCost = order.getItems().stream().mapToDouble(item -> item.getProduct().getUnitPrice() * item.getAmount()).sum();
         order.setTotal(totalCost);
