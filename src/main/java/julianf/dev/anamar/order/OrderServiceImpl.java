@@ -1,21 +1,35 @@
 package julianf.dev.anamar.order;
 
+import jakarta.transaction.Transactional;
+import julianf.dev.anamar.item.Item;
+import julianf.dev.anamar.mapper.OrderMapper;
 import julianf.dev.anamar.order.dto.AddItemToOrderDTO;
-import julianf.dev.anamar.item.ItemRepository;
 import julianf.dev.anamar.order.dto.OrderDTO;
+import julianf.dev.anamar.order.dto.OrderNoItemsDTO;
+import julianf.dev.anamar.product.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Service
 @Slf4j
 public class OrderServiceImpl implements OrderService {
+    private final ProductRepository productRepository;
+
+    private final OrderRepository orderRepository;
+
+    private final OrderMapper orderMapper;
+
     @Autowired
-    private ItemRepository itemRepository;
-    @Autowired
-    OrderRepository orderRepository;
+    public OrderServiceImpl(OrderRepository orderRepository, OrderMapper orderMapper, ProductRepository productRepository) {
+        this.orderRepository = orderRepository;
+        this.orderMapper = orderMapper;
+        this.productRepository = productRepository;
+    }
 
     @Override
     public void save(Orders order) {
@@ -23,37 +37,49 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderDTO> findAll() {
-        return orderRepository.findAll().stream().map(OrderDTO::new).toList();
-    }
+    public List<OrderNoItemsDTO> findAll() {
+        log.info("getOrders");
+        return orderMapper.orderToOrderNoItemsDTO(orderRepository.findAll());
 
-    @Override
-    public List<OrderDTO> findAllNotFinished() {
-        log.info("log {}", orderRepository.findAllByOrderFinishedFalse());
-        return orderRepository.findAllByOrderFinishedFalse().stream().map(OrderDTO::new).toList();
     }
 
     @Override
     public OrderDTO getOrder(Long id) {
-        return new OrderDTO(orderRepository.findById(id)
-                .orElseThrow());
+        return orderMapper.orderToOrderDTO(orderRepository.findById(id).orElseThrow());
     }
 
     @Override
     public void deleteOrder(Orders order) {
-            orderRepository.delete(order);
+        orderRepository.delete(order);
     }
 
     @Override
-    public Orders addItemToOrder(Long id, List<AddItemToOrderDTO> items) {
-        var actualorders = orderRepository.findById(id).orElseThrow();
-        log.info("actualorders: {}", actualorders);
-        for(var item: items){
-            var itemorders = itemRepository.findById(Long.valueOf(item.id())).orElseThrow();
-            itemorders.setAmount(item.amount());
-            actualorders.getItems().add(itemorders);
-        }
-        return orderRepository.save(actualorders);
+    @Transactional
+    public void addItemToOrder(Long id, List<AddItemToOrderDTO> items) {
+        var order = orderRepository.findById(id).orElseThrow();
+        var currentItemList = order.getItems();
+        items.forEach(itemtoAdd -> currentItemList.stream()
+                .filter(existingItem -> Objects.equals(itemtoAdd.productId(), existingItem.getProduct().getId()))
+                .findFirst()
+                .ifPresentOrElse(existingItem -> setExistingItemAmount(existingItem, itemtoAdd.amount()), () -> addNewItem(currentItemList, itemtoAdd)));
+        updateOrderTotal(order);
+        orderRepository.save(order);
+    }
+
+    private void setExistingItemAmount(Item existingItem, int amountToAdd) {
+        existingItem.setAmount(existingItem.getAmount() + amountToAdd);
+    }
+
+    private void addNewItem(Set<Item> itemList, AddItemToOrderDTO itemToAdd) {
+        Item newItem = new Item();
+        newItem.setProduct(productRepository.findById(itemToAdd.productId()).orElseThrow());
+        newItem.setAmount(itemToAdd.amount());
+        itemList.add(newItem);
+    }
+
+    private void updateOrderTotal(Orders order) {
+        double totalCost = order.getItems().stream().mapToDouble(item -> item.getProduct().getUnitPrice() * item.getAmount()).sum();
+        order.setTotal(totalCost);
     }
 
     @Override

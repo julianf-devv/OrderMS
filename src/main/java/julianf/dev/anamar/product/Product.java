@@ -6,8 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -17,7 +20,7 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Long id;
+    private Short id;
 
     private String name;
 
@@ -27,11 +30,16 @@ public class Product {
 
     private Integer stock;
 
+    private LocalDateTime addedDate;
 
     private ProductType type;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<Item> items = new ArrayList<>();
-    // Otros campos y métodos
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    private Set<Item> items = new HashSet<>();
 
+
+    @PrePersist
+    private void prePersist() {
+        this.addedDate = LocalDateTime.now();
+    }
 }

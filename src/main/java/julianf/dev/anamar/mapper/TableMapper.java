@@ -1,6 +1,7 @@
-package julianf.dev.anamar.table.dto;
+package julianf.dev.anamar.mapper;
 
 import julianf.dev.anamar.table.RestaurantTable;
+import julianf.dev.anamar.table.dto.RestaurantTableDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

@@ -6,8 +6,8 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: rest_flota_annamar
-      MYSQL_USER: springstudent
-      MYSQL_PASSWORD: springstudent
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: password
     ports:
       - "3307:3306"
