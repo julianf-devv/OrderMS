@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -86,27 +87,22 @@ public class OrderResource {
     public ResponseEntity<?> deleteItemFromOrder(@PathVariable Long id, @RequestBody List<RemoveItemFromOrderDTO> itemsToDelete) {
         var order = orderRepository.findById(id).orElseThrow();
         var items = order.getItems();
-        log.info("items: {}", items);
-        // Map products to their corresponding items
-        var productToItemMap = items.stream()
-                .collect(Collectors.toMap(item -> item.getProduct().getId(), item -> item));
-        // Remove items marked for deletion
         for (RemoveItemFromOrderDTO itemToDelete : itemsToDelete) {
-            Item item = productToItemMap.get(itemToDelete.productId().shortValue());
-            if (item != null) {
-                if (itemToDelete.removeAllFlag()) {
-                    itemRepository.deleteById((long) item.getId());
-                    items.remove(item);
-                } else {
-                    item.setAmount(item.getAmount() - itemToDelete.amount());
-                    if (item.getAmount() <= 0) {
-                        itemRepository.deleteById((long) item.getId());
-                        items.remove(item);
-                    }
-                }
+            Item item = items.stream()
+                    .filter(i -> Objects.equals(itemToDelete.productId().shortValue(), i.getProduct().getId()))
+                    .findFirst().orElse(null);
+            if (item == null) {
+                continue;
+            }
+            if (itemToDelete.removeAllFlag() || item.getAmount() <= itemToDelete.amount()) {
+                items.remove(item);
+                itemRepository.delete(item);
+            } else {
+                item.setAmount(item.getAmount() - itemToDelete.amount());
             }
         }
-        order.setTotal(items.stream().mapToDouble(item -> item.getProduct().getUnitPrice() * item.getAmount()).sum());
+        double totalCost = items.stream().mapToDouble(item -> item.getProduct().getUnitPrice() * item.getAmount()).sum();
+        order.setTotal(totalCost);
         orderRepository.save(order);
         return ResponseEntity.ok().build();
     }
