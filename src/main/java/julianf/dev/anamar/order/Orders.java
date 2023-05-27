@@ -61,7 +61,7 @@ public class Orders {
     @PreUpdate
     private void preUpdate() {
         this.lastUpdate = LocalDateTime.now();
-        if(this.items != null) {
+        if(this.items != null && !this.items.isEmpty()) {
             log.info("Updating total");
             this.total = items.stream().mapToDouble(item -> item.getProduct().getUnitPrice() * item.getAmount()).sum();
         }

@@ -14,6 +14,7 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/api/v1")
 @Hidden
+// Todo: Add Swagger documentation, Add DTO mapping
 public class WaiterResource {
 
     private final WaiterService waiterService;

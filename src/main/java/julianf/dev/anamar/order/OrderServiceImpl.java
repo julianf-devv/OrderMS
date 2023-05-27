@@ -2,10 +2,12 @@ package julianf.dev.anamar.order;
 
 import jakarta.transaction.Transactional;
 import julianf.dev.anamar.item.Item;
+import julianf.dev.anamar.item.ItemRepository;
 import julianf.dev.anamar.mapper.OrderMapper;
 import julianf.dev.anamar.order.dto.AddItemToOrderDTO;
 import julianf.dev.anamar.order.dto.OrderDTO;
 import julianf.dev.anamar.order.dto.OrderNoItemsDTO;
+import julianf.dev.anamar.order.dto.RemoveItemFromOrderDTO;
 import julianf.dev.anamar.product.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +26,14 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderMapper orderMapper;
 
+    private final ItemRepository itemRepository;
+
     @Autowired
-    public OrderServiceImpl(OrderRepository orderRepository, OrderMapper orderMapper, ProductRepository productRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderMapper orderMapper, ProductRepository productRepository, ItemRepository itemRepository) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.productRepository = productRepository;
+        this.itemRepository = itemRepository;
     }
 
     @Override
@@ -83,11 +88,25 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void deleteItemFromOrder(Long idorders, Long idItem) {
-        var actualorders = orderRepository.findById(idorders).orElseThrow();
-        var itemsorders = actualorders.getItems();
-        itemsorders.removeIf(item -> item.getId() == idItem);
-        orderRepository.save(actualorders);
+    public void deleteItemFromOrder(Long orderID, List<RemoveItemFromOrderDTO> itemsToDelete) {
+        var order = orderRepository.findById(orderID).orElseThrow();
+        var items = order.getItems();
+        for (RemoveItemFromOrderDTO itemToDelete : itemsToDelete) {
+            items.stream()
+                    .filter(i -> Objects.equals(itemToDelete.productId().shortValue(), i.getProduct().getId()))
+                    .findFirst()
+                    .ifPresent(item -> {
+                        if (itemToDelete.removeAllFlag() || item.getAmount() <= itemToDelete.amount()) {
+                            items.remove(item);
+                            itemRepository.delete(item);
+                        } else {
+                            item.setAmount(item.getAmount() - itemToDelete.amount());
+                        }
+                    });
+        }
+        double totalCost = items.stream().mapToDouble(item -> item.getProduct().getUnitPrice() * item.getAmount()).sum();
+        order.setTotal(totalCost);
+        orderRepository.save(order);
     }
 
 
