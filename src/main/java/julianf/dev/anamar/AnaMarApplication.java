@@ -46,7 +46,6 @@ public class AnaMarApplication implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        // TODO Move to a data.sql file
         var cocaCola = new Product();
         cocaCola.setName("Coca Cola");
         cocaCola.setDescription("Refresco de cola");
