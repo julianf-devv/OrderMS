@@ -28,6 +28,9 @@ public class RestaurantTable {
     private Waiter assignedWaiter;
 
 
+    /**
+     */
     public RestaurantTable() {
+        // TODO document why this constructor is empty
     }
 }

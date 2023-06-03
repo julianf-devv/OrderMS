@@ -1,25 +1,24 @@
 version: '3.7'
 
 services:
-  db:
+  anna_mar_db:
     image: mysql:latest
     restart: always
     environment:
       MYSQL_DATABASE: rest_flota_annamar
-      MYSQL_USER: root
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: DEV_JFHC
+      MYSQL_PASSWORD: 7G5X9f2Dc1R3v8H6
+      MYSQL_ROOT_PASSWORD: P$1e6K8n!3y9R#4s7
     ports:
       - "3307:3306"
     volumes:
-      - db-data:/var/lib/mysql
-
+      - anna_mar_db-data:/var/lib/mysql
   app:
     image: my-app-image
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      - anna_mar_db
 
 volumes:
-  db-data:
+  anna_mar_db-data:

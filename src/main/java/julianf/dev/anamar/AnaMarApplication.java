@@ -5,8 +5,6 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.servers.Server;
 import jakarta.transaction.Transactional;
 import julianf.dev.anamar.item.Item;
-import julianf.dev.anamar.item.ItemRepository;
-import julianf.dev.anamar.mapper.OrderMapper;
 import julianf.dev.anamar.order.OrderRepository;
 import julianf.dev.anamar.order.Orders;
 import julianf.dev.anamar.product.Product;
@@ -38,19 +36,15 @@ import java.util.Set;
 public class AnaMarApplication implements CommandLineRunner {
     private final TableRepository tableRepository;
     private OrderRepository orderRepository;
-    private ItemRepository itemRepository;
     private WaiterRepository waiterRepository;
     private ProductRepository productRepository;
-    private OrderMapper orderMapper;
 
     @Autowired
-    public AnaMarApplication(OrderRepository orderRepository, ItemRepository itemRepository, WaiterRepository waiterRepository, ProductRepository productRepository, OrderMapper orderMapper,
+    public AnaMarApplication(OrderRepository orderRepository, WaiterRepository waiterRepository, ProductRepository productRepository,
                              TableRepository tableRepository) {
         this.orderRepository = orderRepository;
-        this.itemRepository = itemRepository;
         this.waiterRepository = waiterRepository;
         this.productRepository = productRepository;
-        this.orderMapper = orderMapper;
         this.tableRepository = tableRepository;
     }
 
@@ -145,7 +139,6 @@ public class AnaMarApplication implements CommandLineRunner {
 
 
         log.info("order after delete {}", orderRepository.findById(1L));
-        // log.info("order items: {}", orderRepository.findById(1L).get().getItems());
 
 
     }
