@@ -25,23 +25,15 @@ import java.util.Set;
 
 @SpringBootApplication
 @Slf4j
-@OpenAPIDefinition(
-        info = @Info(title = "Ana mar API", version = "0.2"),
-        servers = {
-                @Server(url = "http://localhost:8080", description = "Servidor local"),
-                @Server(url = "https://dev.example.com", description = "Servidor de desarrollo"),
-                @Server(url = "https://nonprod.example.com", description = "Servidor de producción")
-        }
-)
+@OpenAPIDefinition(info = @Info(title = "Ana mar API", version = "0.2"), servers = {@Server(url = "http://localhost:8080", description = "Servidor local"), @Server(url = "https://dev.example.com", description = "Servidor de desarrollo"), @Server(url = "https://nonprod.example.com", description = "Servidor de producción")})
 public class AnaMarApplication implements CommandLineRunner {
     private final TableRepository tableRepository;
-    private OrderRepository orderRepository;
-    private WaiterRepository waiterRepository;
-    private ProductRepository productRepository;
+    private final OrderRepository orderRepository;
+    private final WaiterRepository waiterRepository;
+    private final ProductRepository productRepository;
 
     @Autowired
-    public AnaMarApplication(OrderRepository orderRepository, WaiterRepository waiterRepository, ProductRepository productRepository,
-                             TableRepository tableRepository) {
+    public AnaMarApplication(OrderRepository orderRepository, WaiterRepository waiterRepository, ProductRepository productRepository, TableRepository tableRepository) {
         this.orderRepository = orderRepository;
         this.waiterRepository = waiterRepository;
         this.productRepository = productRepository;
@@ -86,6 +78,7 @@ public class AnaMarApplication implements CommandLineRunner {
         consome.setName("Consome");
         consome.setDescription("Consome de pollo");
         consome.setUnitPrice(1.8);
+        consome.setType(ProductType.COMIDA);
         consome.setStock(5);
 
 
@@ -128,16 +121,10 @@ public class AnaMarApplication implements CommandLineRunner {
         order.setItems(Set.of(item1, item2, item3, item4));
         pepsi.setType(ProductType.BEBIDA);
         productRepository.save(consome);
-        //  item.setOrder(order); // Establece el Order en el Item
         orderRepository.save(order);
-
-
         var order23 = orderRepository.findById(1L);
         log.info("order: {}", order23);
-
         orderRepository.deleteById(2L);
-
-
         log.info("order after delete {}", orderRepository.findById(1L));
 
 

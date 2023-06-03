@@ -53,6 +53,7 @@ public interface OrderMapper {
                 item.getProduct().getName(),
                 item.getProduct().getDescription(),
                 item.getProduct().getUnitPrice(),
+                item.getProduct().getType(),
                 item.getAmount(),
                 item.getAmount() * item.getProduct().getUnitPrice()
         )).collect(Collectors.toSet());

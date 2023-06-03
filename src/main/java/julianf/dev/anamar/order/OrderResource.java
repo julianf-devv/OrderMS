@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import julianf.dev.anamar.order.dto.AddItemToOrderDTO;
 import julianf.dev.anamar.order.dto.OrderDTO;
@@ -19,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 
@@ -38,7 +38,7 @@ public class OrderResource {
 
     @Operation(summary = "Get all the orders", description = "Get all the orders active in the system", responses = @ApiResponse(responseCode = "201", description = "Successfully retrieved all the orders"))
     @GetMapping("/v1/orders")
-    public List<OrderNoItemsDTO> getOrders(HttpServletResponse response) {
+    public List<OrderNoItemsDTO> getOrders() {
         log.info("getOrders");
         return orderService.findAll();
     }
@@ -51,7 +51,7 @@ public class OrderResource {
     @PutMapping("/v1/orders/{id}")
     @Operation(summary = "Add item(s) to an order")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Item(s) added to order", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrderDTO.class))),
-                            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "application/json"))})
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "application/json"))})
     @Validated
     public void addItemToOrder(@PathVariable Long id, @RequestBody @Parameter(description = "Item(s) to be added to the order") @Valid List<AddItemToOrderDTO> items) {
         log.info("items: {}", items);
@@ -59,7 +59,7 @@ public class OrderResource {
     }
 
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "Item(s) deleted from order", content = @Content(mediaType = "application/json", schema = @Schema(implementation = OrderDTO.class))),
-                            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "application/json"))})
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content(mediaType = "application/json"))})
     @Transactional
     @DeleteMapping("/v1/orders/{id}")
     @Operation(summary = "Remove item(s) from an order")
