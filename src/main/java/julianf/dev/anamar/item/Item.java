@@ -7,27 +7,28 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-
-
 @Entity
 @Getter
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @ToString
 public class Item {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private short id;
-    private int amount;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private short id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @ToString.Exclude
-    private Product product;
+  private int amount;
 
-    @Column(name = "notes")
-    private String notes;
+  @ManyToOne(
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @ToString.Exclude
+  private Product product;
 
-    //Based on the notes if something extra or something its removed for the product it will adjust the price
-    private double priceAdjustment;
+  @Column(name = "notes")
+  private String notes;
 
+  // Based on the notes if something extra or something its removed for the product it will adjust
+  // the price
+  private double priceAdjustment;
 }

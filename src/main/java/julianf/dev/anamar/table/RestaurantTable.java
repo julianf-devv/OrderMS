@@ -1,36 +1,33 @@
 package julianf.dev.anamar.table;
 
-
 import jakarta.persistence.*;
 import julianf.dev.anamar.waiter.Waiter;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-
 @Entity
 @ToString
-@Getter @Setter
-@jakarta.persistence.Table(name = "restaurant_table")
+@Getter
+@Setter
+@Table(name = "restaurant_table")
 public class RestaurantTable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private short tableNumber;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private short tableNumber;
 
-    @Column(name = "occupied")
-    private boolean occupied;
+  @Column(name = "occupied")
+  private boolean occupied;
 
-    private short capacity;
+  private short capacity;
 
-    @ManyToOne
-    @JoinColumn(name = "attending_waiter_id")
-    @ToString.Exclude
-    private Waiter assignedWaiter;
+  @ManyToOne
+  @JoinColumn(name = "attending_waiter_id")
+  @ToString.Exclude
+  private Waiter assignedWaiter;
 
+  /** */
+  public RestaurantTable() {
 
-    /**
-     */
-    public RestaurantTable() {
-        // TODO document why this constructor is empty
-    }
+  }
 }

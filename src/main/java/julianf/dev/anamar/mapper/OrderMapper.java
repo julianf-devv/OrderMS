@@ -1,6 +1,10 @@
 package julianf.dev.anamar.mapper;
 
-
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import julianf.dev.anamar.item.Item;
 import julianf.dev.anamar.order.Orders;
 import julianf.dev.anamar.order.dto.OrderDTO;
@@ -13,51 +17,51 @@ import julianf.dev.anamar.waiter.dto.WaiterDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
-    @Mapping(target = "orderItems", expression = "java(mapToProductDTOs(order.getItems()))")
-    OrderDTO orderToOrderDTO(Orders order);
+  @Mapping(target = "orderItems", expression = "java(mapToProductDTOs(order.getItems()))")
+  OrderDTO orderToOrderDTO(Orders order);
 
-    @Mapping(source = "associatedTable", target = "table")
-    OrderNoItemsDTO orderToOrderNoItemsDTO(Orders order);
+  @Mapping(source = "associatedTable", target = "table")
+  OrderNoItemsDTO orderToOrderNoItemsDTO(Orders order);
 
-    List<OrderNoItemsDTO> orderToOrderNoItemsDTO(List<Orders> order);
-    @Mapping(source = "assignedWaiter", target = "waiter")
-    @Mapping(source = "tableNumber", target = "id")
-    RestaurantTableDTO restaurantTableToRestaurantTableDTO(RestaurantTable restaurantTable);
+  List<OrderNoItemsDTO> orderToOrderNoItemsDTO(List<Orders> order);
 
-    WaiterDTO waiterToWaiterDTO(Waiter waiter);
+  @Mapping(source = "assignedWaiter", target = "waiter")
+  @Mapping(source = "tableNumber", target = "id")
+  RestaurantTableDTO restaurantTableToRestaurantTableDTO(RestaurantTable restaurantTable);
 
-    List<OrderDTO> ordersToOrderDTOs(List<Orders> orders);
+  WaiterDTO waiterToWaiterDTO(Waiter waiter);
 
-    default Set<ProductDTO> mapToProductDTOs(Set<Item> items) {
-        Map<String, Item> productMap = new HashMap<>();
-        for (Item item : items) {
-            String productName = item.getProduct().getName();
-            Item existingItem = productMap.get(productName);
-            if (existingItem != null) {
-                existingItem.setAmount(existingItem.getAmount() + item.getAmount());
-            } else {
-                productMap.put(productName, item);
-            }
-        }
-        return productMap.values().stream().map(item -> new ProductDTO(
-                item.getProduct().getName(),
-                item.getProduct().getDescription(),
-                item.getProduct().getUnitPrice(),
-                item.getProduct().getType(),
-                item.getAmount(),
-                item.getAmount() * item.getProduct().getUnitPrice()
-        )).collect(Collectors.toSet());
+  List<OrderDTO> ordersToOrderDTOs(List<Orders> orders);
+
+  /**
+   * This method maps a list of items to a list of productDTOs
+   *
+   * @param items
+   * @return
+   */
+  default Set<ProductDTO> mapToProductDTOs(Set<Item> items) {
+    Map<String, Item> productMap = new HashMap<>();
+    for (Item item : items) {
+      String productName = item.getProduct().getName();
+      Item existingItem = productMap.get(productName);
+      if (existingItem != null) {
+        existingItem.setAmount(existingItem.getAmount() + item.getAmount());
+      } else {
+        productMap.put(productName, item);
+      }
     }
-
+    return productMap.values().stream()
+        .map(
+            item ->
+                new ProductDTO(
+                    item.getProduct().getName(),
+                    item.getProduct().getDescription(),
+                    item.getProduct().getUnitPrice(),
+                    item.getProduct().getType(),
+                    item.getAmount(),
+                    item.getAmount() * item.getProduct().getUnitPrice()))
+        .collect(Collectors.toSet());
+  }
 }
-

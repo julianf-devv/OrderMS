@@ -11,24 +11,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Schema(hidden = true)
 public class AddItemToOrderDTO {
-    private Short productId;
+  private Short productId;
 
-    @Max(50)
-    private int amount;
+  @Max(50)
+  private int amount;
 
-    public Short productId() {
-        return productId;
-    }
+  public Short productId() {
+    return productId;
+  }
 
-    public void setProductId(Short productId) {
-        this.productId = productId;
-    }
+  public void setProductId(Short productId) {
+    this.productId = productId;
+  }
 
-    public int amount() {
-        return amount;
-    }
+  public int amount() {
+    return amount;
+  }
 
-    public void setAmount(int amount) {
-        this.amount = amount;
-    }
+  public void setAmount(int amount) {
+    this.amount = amount;
+  }
 }
